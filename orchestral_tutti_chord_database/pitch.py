@@ -1,8 +1,9 @@
-PITCHCLASSES = "CDEFGAB"
+import re
+
 PITCHID = [0, 2, 4, 5, 7, 9, 11]
 
 
-def get_accidental_index(accidental):
+def get_accidental_index(accidental) -> int:
     if not accidental or type(accidental) != str:
         return 0
     if not all(x in "#bx" for x in accidental):
@@ -13,31 +14,67 @@ def get_accidental_index(accidental):
     return sharp + double_sharp * 2 - flat
 
 
-def get_properties(pitch_name: str):
-    if not pitch_name:
-        raise IndexError("Pitch name cannot be empty.")
-    if any(x in pitch_name for x in PITCHCLASSES):
-        pitch_class = pitch_name[0]
-        class_index = PITCHCLASSES.index(pitch_class)
-        index = PITCHID[class_index]
-
-        accidental = pitch_name[1:] if len(pitch_name) else ""
-        accidental_index = get_accidental_index(accidental)
-
-        return {
-            "name": pitch_name,
-            "class": pitch_class,
-            "class_index": class_index,
-            "index": index + accidental_index,
-            "accidental": accidental,
-            "accidental_index": accidental_index,
-        }
-    else:
-        raise ValueError(f"No pitch class found in {pitch_name}.")
+def get_accidental(i: int) -> str:
+    s = ""
+    if i > 0:
+        s = "x" * (i // 2) + "#" * (i % 2)
+    elif i < 0:
+        s = "b" * abs(i)
+    return s
 
 
-def get_midinum(pitch_name: str, octave: int):
-    return octave * 12 + get_properties(pitch_name)["index"]
+class Pitch:
+    PITCHCLASSES = "CDEFGAB"
+    PITCHID = [0, 2, 4, 5, 7, 9, 11]
+
+    def __init__(self, in_str: str = "B", octave: int = 4):
+        a = re.split("([0-9]+)", in_str)
+        pitch_name = a[0]
+        if len(a) > 1:
+            octave = int(a[1])
+        if pitch_name[0] in self.PITCHCLASSES:
+            self.set_properties(pitch_name)
+        elif pitch_name[0].isalpha():
+            self.set_properties(
+                chr((ord(pitch_name[0]) - 65) % 7 + 65) + pitch_name[1:]
+            )
+        else:
+            raise ValueError(f"No pitch class found in {pitch_name}.")
+        self.midinum: int = octave * 12 + self.index
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        del self
+
+    def set_properties(self, pitch_name: str):
+        if not pitch_name:
+            raise IndexError("Pitch name cannot be empty.")
+        self.name: str = pitch_name
+        self.pitch_class: str = pitch_name[0]
+        self.pitch_class_index: int = self.PITCHCLASSES.index(self.pitch_class)
+        self.accidental: str = pitch_name[1:] if len(pitch_name) else ""
+        self.accidental_index: int = get_accidental_index(self.accidental)
+        self.index: int = PITCHID[self.pitch_class_index] + self.accidental_index
+
+    def enharmonics(self) -> list:
+        def sortlist(x):
+            if x == self.name:
+                return -1
+            else:
+                return abs(get_accidental_index(x[1:]))
+
+        pitch_classes_index = [(self.pitch_class_index + x) % 7 for x in range(-2, 3)]
+        a = []
+        for each in pitch_classes_index:
+            pitch_class = self.PITCHCLASSES[each]
+            diff = self.index - self.PITCHID[each]
+            diff += -12 if diff > 3 else 12 if diff < -3 else 0
+            if abs(diff) > 2:
+                continue
+            a.append(pitch_class + get_accidental(diff))
+        return sorted(a, key=sortlist)
 
 
 def detect_interval(lower, upper):
@@ -99,34 +136,35 @@ def detect_root(note_list: list):
     midinums = [x[1] for x in note_list]
     return pitch_names[midinums.index(sorted(midinums)[0])]
 
+
 def gen_chord_name(extension, interval_list):
     def quality(i):
         try:
-            return interval_list[i-1][0]
+            return interval_list[i - 1][0]
         except IndexError:
             return 0
 
     def only_one(i):
-        return len(interval_list[i-1]) == 1
+        return len(interval_list[i - 1]) == 1
 
     def chk_quality(i, alt):
         return only_one(i) and quality(i) == alt
 
     def is_empty(i):
-        return not interval_list[i-1]
+        return not interval_list[i - 1]
 
     def get_function():
-        function = suspension = ''
+        function = suspension = ""
         if not interval_list[2]:
             if chk_quality(2, 0):
-                suspension += 'sus2'
+                suspension += "sus2"
             if chk_quality(4, 0):
                 if not suspension:
-                    suspension = 'sus'
+                    suspension = "sus"
                 else:
-                    suspension += '4'
+                    suspension += "4"
         elif -1 in interval_list[2]:
-            function = 'm'
+            function = "m"
         return function, suspension
 
     major7 = False
@@ -167,10 +205,10 @@ def gen_chord_name(extension, interval_list):
 
     if chord_name == "7#9b9#5b5":
         chord_name = "7alt"
-    if 'o' in chord_name:
-        chord_name = chord_name.replace('m', '').replace('b5', '')
-    if chord_name == 'mb5':
-        chord_name = 'o'
+    if "o" in chord_name:
+        chord_name = chord_name.replace("m", "").replace("b5", "")
+    if chord_name == "mb5":
+        chord_name = "o"
     if chord_name[-2:] == "#5":
         chord_name = chord_name.replace("#5", "+")
     if chord_name == "Maj":
@@ -196,9 +234,8 @@ def detect_chord(note_list: list):
     extension = max(intervals, key=filter_mixolydian, default=(5, 0))[0]
 
     chord_name = gen_chord_name(
-        extension,
-        [[x[1] for x in intervals if x[0] == y] for y in range(1, 8)]
-        )
+        extension, [[x[1] for x in intervals if x[0] == y] for y in range(1, 8)]
+    )
 
     if chord_name is not None:
         return root + chord_name
