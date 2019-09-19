@@ -1,5 +1,6 @@
 import re
 
+PITCHCLASSES = "CDEFGAB"
 PITCHID = [0, 2, 4, 5, 7, 9, 11]
 
 
@@ -24,15 +25,14 @@ def get_accidental(i: int) -> str:
 
 
 class Pitch:
-    PITCHCLASSES = "CDEFGAB"
-    PITCHID = [0, 2, 4, 5, 7, 9, 11]
-
     def __init__(self, in_str: str = "B", octave: int = 4):
+        if not in_str:
+            raise IndexError("Pitch name cannot be empty.")
         a = re.split("([0-9]+)", in_str)
         pitch_name = a[0]
         if len(a) > 1:
             octave = int(a[1])
-        if pitch_name[0] in self.PITCHCLASSES:
+        if pitch_name[0] in PITCHCLASSES:
             self.set_properties(pitch_name)
         elif pitch_name[0].isalpha():
             self.set_properties(
@@ -49,11 +49,9 @@ class Pitch:
         del self
 
     def set_properties(self, pitch_name: str):
-        if not pitch_name:
-            raise IndexError("Pitch name cannot be empty.")
         self.name: str = pitch_name
         self.pitch_class: str = pitch_name[0]
-        self.pitch_class_index: int = self.PITCHCLASSES.index(self.pitch_class)
+        self.pitch_class_index: int = PITCHCLASSES.index(self.pitch_class)
         self.accidental: str = pitch_name[1:] if len(pitch_name) else ""
         self.accidental_index: int = get_accidental_index(self.accidental)
         self.index: int = PITCHID[self.pitch_class_index] + self.accidental_index
@@ -68,8 +66,8 @@ class Pitch:
         pitch_classes_index = [(self.pitch_class_index + x) % 7 for x in range(-2, 3)]
         a = []
         for each in pitch_classes_index:
-            pitch_class = self.PITCHCLASSES[each]
-            diff = self.index - self.PITCHID[each]
+            pitch_class = PITCHCLASSES[each]
+            diff = self.index - PITCHID[each]
             diff += -12 if diff > 3 else 12 if diff < -3 else 0
             if abs(diff) > 2:
                 continue
