@@ -1,5 +1,5 @@
 import pytest
-from orchestral_tutti_chord_database.parser import ChordInfo, parse_instrument
+from orchestral_tutti_chord_database.parser import ChordInfo
 
 
 class TestParseInfo:
@@ -24,8 +24,7 @@ class TestParseInfo:
         ],
     )
     def test_parse_info_long(self, key, value, result):
-        obj = ChordInfo()
-        assert obj.parse_info(key, value) == (key, result)
+        assert ChordInfo.parse_info(key, value) == (key, result)
 
     @pytest.mark.parametrize(
         "short, key, value, result",
@@ -49,8 +48,7 @@ class TestParseInfo:
         ],
     )
     def test_parse_info_short(self, short, key, value, result):
-        obj = ChordInfo()
-        assert obj.parse_info(short, value) == (key, result)
+        assert ChordInfo.parse_info(short, value) == (key, result)
 
     @pytest.mark.parametrize(
         "line, key, value",
@@ -81,3 +79,35 @@ class TestParseInfo:
         obj = ChordInfo()
         obj.parse_line(line)
         assert getattr(obj, key, None) == value
+
+
+class TestParseInstrument:
+    @pytest.mark.parametrize(
+        "line, result",
+        [
+            pytest.param(
+                "Picc.:D6,fff", ("Picc.", ["D6"], "fff", None), id="Piccolo_D5_fff"
+            ),
+            pytest.param(
+                "Flute:<F#5 A5>,fff",
+                ("Flute", ["F#5", "A5"], "fff", None),
+                id="Flute_F#5-A5_fff",
+            ),
+            pytest.param(
+                "Oboes:<F#4 A4>,fff,Fermata",
+                ("Oboes", ["F#4", "A4"], "fff", "Fermata"),
+                id="Oboes_F#4-A4_fff_fermata",
+            ),
+            pytest.param(
+                "Clarinets:<D4 D5>,,Fermata",
+                ("Clarinets", ["D4", "D5"], None, "Fermata"),
+                id="Clarinets_D4-D5_fermata",
+            ),
+            pytest.param(
+                "Flute:,,Fermata", ("Flute", [""], None, "Fermata"), id="No_notes==rest"
+            ),
+            pytest.param("Flute:", ("Flute", [""], None, None), id="No_value==rest"),
+        ],
+    )
+    def test_parse_instrument_direct(self, line, result):
+        assert ChordInfo.parse_instrument(*line.split(":")) == result
