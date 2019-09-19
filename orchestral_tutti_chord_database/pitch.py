@@ -77,11 +77,11 @@ class Pitch:
 
 def detect_interval(lower, upper):
     if type(lower) is str:
-        lower = get_properties(lower)
+        lower = Pitch(lower)
     if type(upper) is str:
-        upper = get_properties(upper)
-    quantity = (upper["class_index"] - lower["class_index"]) % 7
-    quality = (upper["index"] - lower["index"]) % 12 - PITCHID[quantity]
+        upper = Pitch(upper)
+    quantity = (upper.pitch_class_index - lower.pitch_class_index) % 7
+    quality = (upper.index - lower.index) % 12 - PITCHID[quantity]
     return (quantity + 1, quality)
 
 
@@ -137,19 +137,13 @@ def detect_root(note_list: list):
 
 def gen_chord_name(extension, interval_list):
     def quality(i):
-        try:
-            return interval_list[i - 1][0]
-        except IndexError:
-            return 0
+        return interval_list[i - 1][0]
 
     def only_one(i):
         return len(interval_list[i - 1]) == 1
 
     def chk_quality(i, alt):
         return only_one(i) and quality(i) == alt
-
-    def is_empty(i):
-        return not interval_list[i - 1]
 
     def get_function():
         function = suspension = ""
@@ -209,8 +203,6 @@ def gen_chord_name(extension, interval_list):
         chord_name = "o"
     if chord_name[-2:] == "#5":
         chord_name = chord_name.replace("#5", "+")
-    if chord_name == "Maj":
-        chord_name = ""
 
     return chord_name
 
@@ -226,9 +218,9 @@ def detect_chord(note_list: list):
     pitch_names = [x[0] for x in note_list]
     filtered_pitch_names = sorted(set(pitch_names), key=lambda x: x[0])
     intervals = sorted(
-        x[0] * 2 if (x[0] % 2) == 0 else x
-        for x in get_intervals(filtered_pitch_names, root)
+        x for x in get_intervals(filtered_pitch_names, root)
     )
+    print(intervals)
     extension = max(intervals, key=filter_mixolydian, default=(5, 0))[0]
 
     chord_name = gen_chord_name(

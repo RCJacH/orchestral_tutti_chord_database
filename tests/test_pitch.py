@@ -109,7 +109,6 @@ class TestPitchClass:
             assert obj.enharmonics() == enharmonics
 
 
-@pytest.mark.skip
 class TestInterval:
     class TestSingleInterval:
         def test_natural_major_seconds(self):
@@ -210,7 +209,6 @@ class TestInterval:
             ]
 
 
-@pytest.mark.skip
 class TestInversion:
     class TestTriad:
         def test_triad_root(self):
@@ -258,7 +256,6 @@ class TestInversion:
             assert pitch.identify_inversion([[x] for x in {4, 2, 4}]) == None
 
 
-@pytest.mark.skip
 class TestChordDetection:
     class TestRootDetection:
         def test_C_triad_root(self):
@@ -376,6 +373,7 @@ class TestChordDetection:
         with pytest.raises(IndexError):
             assert pitch.detect_chord([])
 
+
     def test_major(self):
         assert pitch.detect_chord([("C", 0), ("G", 7), ("E", 16)]) == "C"
         assert pitch.detect_chord([("E", 28), ("C#", 61), ("A", 9)]) == "A"
@@ -383,3 +381,6 @@ class TestChordDetection:
     def test_minor(self):
         assert pitch.detect_chord([("C", 0), ("G", 7), ("Eb", 16)]) == "Cm"
         assert pitch.detect_chord([("F#", 42), ("B", 35), ("D", 38)]) == "Bm"
+
+    # def test_ambiguous(self):
+        # assert pitch.detect_chord([('C', 0), ('C#', 0), ('D', 0)]) == None
