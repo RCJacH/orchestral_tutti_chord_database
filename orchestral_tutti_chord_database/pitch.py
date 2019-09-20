@@ -74,10 +74,24 @@ class Pitch:
             a.append(pitch_class + get_accidental(diff))
         return sorted(a, key=sortlist)
 
-class Interval:
 
-    def __init__(self, lower, upper):
-        self.quantity, self.quality = detect_interval(lower, upper)
+class Interval:
+    def __init__(self, lower, upper=None):
+        if isinstance(lower, int) and isinstance(upper, int):
+            self.quantity, self.quality = lower, upper
+        elif isinstance(lower, str) and isinstance(upper, str):
+            self.quantity, self.quality = self.detect_interval(lower, upper)
+        elif isinstance(lower, str) and not upper:
+            self.quantity, self.quality = self.interpret(lower)
+
+    def __abs__(self):
+        pitch_class_index = self.quantity - 1
+        return (pitch_class_index // 7) * 12 + PITCHID[pitch_class_index % 7] + self.quality
+
+    @staticmethod
+    def interpret(interval):
+        accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]
+        return (int(degree), get_accidental_index(accidental))
 
     @staticmethod
     def detect_interval(lower, upper):
@@ -88,6 +102,18 @@ class Interval:
         quantity = (upper.pitch_class_index - lower.pitch_class_index) % 7
         quality = (upper.index - lower.index) % 12 - PITCHID[quantity]
         return (quantity + 1, quality)
+
+
+class Intervals:
+    @staticmethod
+    def get_intervals(pitch_names: list, from_root=None):
+        intervals = []
+        for i in range(len(pitch_names) - 1):
+            intervals.append(
+                Interval(from_root if from_root else pitch_names[i], pitch_names[i + 1])
+            )
+        return intervals
+
 
 def detect_interval(lower, upper):
     if type(lower) is str:
@@ -231,9 +257,7 @@ def detect_chord(note_list: list):
     root = detect_root(note_list)
     pitch_names = [x[0] for x in note_list]
     filtered_pitch_names = sorted(set(pitch_names), key=lambda x: x[0])
-    intervals = sorted(
-        x for x in get_intervals(filtered_pitch_names, root)
-    )
+    intervals = sorted(x for x in get_intervals(filtered_pitch_names, root))
     print(intervals)
     extension = max(intervals, key=filter_mixolydian, default=(5, 0))[0]
 

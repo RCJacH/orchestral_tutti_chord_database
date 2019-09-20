@@ -110,6 +110,11 @@ class TestPitchClass:
 
 
 class TestIntervalClass:
+    @pytest.mark.parametrize("numbers", [(1, 0), (2, -1), (4, 1), (5, -1), (7, -2)])
+    def test_direct_init(self, numbers):
+        obj = Interval(*numbers)
+        assert (obj.quantity, obj.quality) == numbers
+
     @pytest.mark.parametrize(
         "pairs, result",
         [
@@ -149,6 +154,29 @@ class TestIntervalClass:
         for each in pairs:
             obj = Interval(*each)
             assert (obj.quantity, obj.quality) == result
+
+    @pytest.mark.parametrize(
+        "interval, result",
+        [("b3", (3, -1)), ("5", (5, 0)), ("#4", (4, 1)), ("bb7", (7, -2))],
+    )
+    def test_interpret(self, interval, result):
+        obj = Interval(interval)
+        assert (obj.quantity, obj.quality) == result
+
+    @pytest.mark.parametrize(
+        "interval, result",
+        [("b3", 3), ("5", 7), ("#4", 6), ("bb7", 9), ('#9', 15), ('b13', 20)],
+    )
+    def test__abs__(self, interval, result):
+        obj = Interval(interval)
+        assert abs(obj) == result
+
+# class TestIntervalsClass:
+#     def test_triad_inversion(self, tuplets, result):
+#         for each in tuplets:
+#             obj = Intervals(*tuplets)
+#             pass
+
 
 class TestInterval:
     class TestIntervals:
