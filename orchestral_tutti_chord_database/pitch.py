@@ -42,11 +42,8 @@ class Pitch:
             raise ValueError(f"No pitch class found in {pitch_name}.")
         self.midinum: int = octave * 12 + self.index
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        del self
+    def __eq__(self, other):
+        return self.index % 12 == other.index % 12
 
     def set_properties(self, pitch_name: str):
         self.name: str = pitch_name

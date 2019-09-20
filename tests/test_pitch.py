@@ -70,13 +70,13 @@ class TestPitchClass:
         ],
     )
     def test_single_pitch(self, pit, keys):
-        with Pitch(pit) as obj:
-            assert obj.name == keys[0]
-            assert obj.index == keys[1]
-            assert obj.pitch_class == keys[2]
-            assert obj.pitch_class_index == keys[3]
-            assert obj.accidental == keys[4]
-            assert obj.accidental_index == keys[5]
+        obj = Pitch(pit)
+        assert obj.name == keys[0]
+        assert obj.index == keys[1]
+        assert obj.pitch_class == keys[2]
+        assert obj.pitch_class_index == keys[3]
+        assert obj.accidental == keys[4]
+        assert obj.accidental_index == keys[5]
 
     @pytest.mark.parametrize(
         "s, i, midi",
@@ -105,8 +105,20 @@ class TestPitchClass:
         ],
     )
     def test_enharmonics(self, pit, enharmonics):
-        with Pitch(pit) as obj:
-            assert obj.enharmonics() == enharmonics
+        obj = Pitch(pit)
+        assert obj.enharmonics() == enharmonics
+
+    @pytest.mark.parametrize(
+        "base, other",
+        [
+            pytest.param("C", "B#", id="C==B#"),
+            pytest.param("F#", "Gb", id="F#==Gb"),
+            pytest.param("E#", "F", id="E#==F"),
+            pytest.param("G", "Abb", id="G==Abb"),
+        ],
+    )
+    def test__eq__(self, base, other):
+        assert Pitch(base) == Pitch(other)
 
 
 class TestIntervalClass:
