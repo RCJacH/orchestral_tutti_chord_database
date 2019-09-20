@@ -106,8 +106,7 @@ class Interval:
         )
 
     def __neg__(self):
-        quantity = 9 - (self.quantity - 1) % 7 - 1
-        quality = -self.quality if quantity in (1, 4, 5, 8) else -1 - self.quality
+        quantity, quality = self.inversion(self.quantity, self.quality)
         return Interval(quantity, quality)
 
     def __eq__(self, other):
@@ -141,6 +140,11 @@ class Interval:
         quality = (upper.index - lower.index) % 12 - PITCHID[quantity]
         return (quantity + 1, quality)
 
+    @staticmethod
+    def inversion(quantity, quality):
+        quantity = 9 - (quantity - 1) % 7 - 1
+        quality = -quality if quantity in (1, 4, 5, 8) else -1 - quality
+        return (quantity, quality)
 
 class Intervals:
     @staticmethod
