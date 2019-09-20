@@ -135,6 +135,16 @@ class TestParseInstrument:
                 ('bass', "fvb8", ['D1', 'D2'], None, None),
                 id="vb8_No_transposition"
             ),
+            pytest.param(
+                "inst:{t|2}<C C'>",
+                ('inst', "t", ['D4', 'D5'], None, None),
+                id="t+2"
+            ),
+            pytest.param(
+                "inst:{t|-3}<D D'>",
+                ('inst', "t", ['Bb3', 'Bb4'], None, None),
+                id="t+2"
+            ),
         ],
     )
     def test_parse_instrument_detection(self, line, result):
