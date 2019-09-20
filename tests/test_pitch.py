@@ -124,20 +124,20 @@ class TestPitchClass:
     @pytest.mark.parametrize(
         "base, interval, result",
         [
-            pytest.param("C", "b3", 'Eb', id="C_tranpose_to_Eb"),
-            pytest.param("A", "5", 'E', id="A_transpose_to_E"),
-            pytest.param("Db", '#2', "E", id="Db_transpose_to_E"),
-            pytest.param("B#", 'b2', "C#", id="B#_transpose_to_C#"),
+            pytest.param("C", "b3", "Eb", id="C_tranpose_to_Eb"),
+            pytest.param("A", "5", "E", id="A_transpose_to_E"),
+            pytest.param("Db", "#2", "E", id="Db_transpose_to_E"),
+            pytest.param("B#", "b2", "C#", id="B#_transpose_to_C#"),
         ],
     )
     def test_transpose(self, base, interval, result):
         assert Pitch(base).transpose(interval) == Pitch(result)
 
+
 class TestIntervalClass:
     @pytest.mark.parametrize("numbers", [(1, 0), (2, -1), (4, 1), (5, -1), (7, -2)])
     def test_direct_init(self, numbers):
-        obj = Interval(*numbers)
-        assert (obj.quantity, obj.quality) == numbers
+        assert Interval(*numbers).values() == numbers
 
     @pytest.mark.parametrize(
         "pairs, result",
@@ -176,16 +176,14 @@ class TestIntervalClass:
     )
     def test_single_interval(self, pairs, result):
         for each in pairs:
-            obj = Interval(*each)
-            assert (obj.quantity, obj.quality) == result
+            assert Interval(*each).values() == result
 
     @pytest.mark.parametrize(
         "interval, result",
         [("b3", (3, -1)), ("5", (5, 0)), ("#4", (4, 1)), ("bb7", (7, -2))],
     )
     def test_interpret(self, interval, result):
-        obj = Interval(interval)
-        assert (obj.quantity, obj.quality) == result
+        assert Interval(interval).values() == result
 
     @pytest.mark.parametrize(
         "interval, result",
@@ -206,8 +204,7 @@ class TestIntervalClass:
         ],
     )
     def test__neg__(self, interval, result):
-        obj = -Interval(interval)
-        assert (obj.quantity, obj.quality) == result
+        assert (-Interval(interval)).values() == result
 
     @pytest.mark.parametrize(
         "base, other",
@@ -234,8 +231,7 @@ class TestIntervalClass:
         ],
     )
     def test__add__(self, base, other, result):
-        obj = Interval(base) + Interval(other)
-        assert (obj.quantity, obj.quality) == result
+        assert (Interval(base) + Interval(other)).values() == result
 
     @pytest.mark.parametrize(
         "base, other, result",
@@ -250,8 +246,7 @@ class TestIntervalClass:
         ],
     )
     def test__sub__(self, base, other, result):
-        obj = Interval(base) - Interval(other)
-        assert (obj.quantity, obj.quality) == result
+        assert (Interval(base) - Interval(other)).values() == result
 
 
 # class TestIntervalsClass:
