@@ -100,6 +100,11 @@ class Interval:
     def __eq__(self, other):
         return abs(self) == abs(other)
 
+    def __add__(self, other):
+        quantity = self.quantity + other.quantity - 1
+        quality = (abs(self) + abs(other))%12 - PITCHID[(quantity-1)%7]
+        return Interval(quantity, quality)
+
     @staticmethod
     def interpret(interval):
         accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]

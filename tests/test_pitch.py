@@ -186,16 +186,31 @@ class TestIntervalClass:
         assert (obj.quantity, obj.quality) == result
 
     @pytest.mark.parametrize(
-        "interval, other",
+        "base, other",
         [
             pytest.param((3, 1), (4, 0), id="#3==4"),
             pytest.param((4, 1), (5, -1), id="#4==b5"),
             pytest.param((9, -1), (8, 1), id="b9==#8"),
         ],
     )
-    def test__eq__(self, interval, other):
-        assert Interval(*interval) == Interval(*other)
+    def test__eq__(self, base, other):
+        assert Interval(*base) == Interval(*other)
 
+    @pytest.mark.parametrize(
+        "base, other, result",
+        [
+            pytest.param('3', 'b3', (5, 0), id="3+b3==5"),
+            pytest.param('2', 'b2', (3, -1), id="2+b2==b3"),
+            pytest.param('4', '#2', (5, 1), id="4+#2==#5"),
+            pytest.param('7', '3', (9, 1), id="7+3==#9"),
+            pytest.param('6', 'b3', (8, 0), id="6+b3==8"),
+            pytest.param('#11', 'b3', (13, 0), id="#11+b3==13"),
+            pytest.param('1', '#1', (1, 1), id="1+#1==#1"),
+        ],
+    )
+    def test__eq__(self, base, other, result):
+        obj = Interval(base) + Interval(other)
+        assert (obj.quantity, obj.quality) == result
 # class TestIntervalsClass:
 #     def test_triad_inversion(self, tuplets, result):
 #         for each in tuplets:
