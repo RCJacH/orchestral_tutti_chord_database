@@ -1,3 +1,5 @@
+from orchestral_tutti_chord_database.pitch import Pitch
+
 class ChordInfo:
     long = [
         "composer",
@@ -13,6 +15,8 @@ class ChordInfo:
         "chord",
     ]
     short = ["c", "y", "o", "n", "m", "b", "t", "s", "p", "i", "h"]
+
+    clefs = {"treble": 4, "t": 4, "g": 4, "bass": 2, "f": 2, "c": 3, "alto": 3}
 
     def __init__(self):
         pass
@@ -40,15 +44,18 @@ class ChordInfo:
 
     @classmethod
     def parse_instrument(cls, instrument: str, v: str) -> tuple:
-        def get_note(note, clef, adj=''):
-            clefs = {"treble": 4, "t": 4, "g": 4, "bass": 2, "f": 2, "c": 3, "alto": 3}
+        def get_note(note, transpose, clef, adj=''):
             number: int = note.count("'") - note.count(",")
-            if clef in clefs:
-                number += clefs[clef]
+            if clef in cls.clefs:
+                number += cls.clefs[clef]
             if adj != '':
                 number += int(adj.replace("a", "").replace("b", "-"))//8
-
-            return note.replace("'", "").replace(",", "") + str(number)
+            note = note.replace("'", "").replace(",", "")
+            if 'a' in transpose:
+                pass
+            elif transpose != '':
+                note = Pitch(note).transpose(transpose).name
+            return note + str(number)
 
         detection = None
         clef = "treble"
@@ -60,8 +67,8 @@ class ChordInfo:
         else:
             notes = [values[0]]
         if detection:
-            clef, mode = detection.split("|")
-            notes = [get_note(x, *clef.split('v')) for x in notes]
+            clef, transpose = detection.split("|")
+            notes = [get_note(x, transpose, *clef.split('v')) for x in notes]
         dynamic = values[1] if (len(values) > 1 and values[1]) else None
         technique = values[2] if (len(values) > 2 and values[2]) else None
         return (instrument, clef, notes, dynamic, technique)
