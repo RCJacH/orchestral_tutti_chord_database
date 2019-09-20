@@ -40,17 +40,20 @@ class ChordInfo:
 
     @classmethod
     def parse_instrument(cls, instrument: str, v: str) -> tuple:
-        def get_note(note):
+        def get_note(note, clef, adj=''):
             clefs = {"treble": 4, "t": 4, "g": 4, "bass": 2, "f": 2, "c": 3, "alto": 3}
             number: int = note.count("'") - note.count(",")
             if clef in clefs:
                 number += clefs[clef]
+            if adj != '':
+                number += int(adj.replace("a", "").replace("b", "-"))//8
+
             return note.replace("'", "").replace(",", "") + str(number)
 
+        detection = None
+        clef = "treble"
         if "{" in v and "}" in v:
             detection, v = v.replace("{", "").split("}", 1)
-        else:
-            detection = None
         values = v.split("|", 3)
         if "<" in values[0] and ">" in values[0]:
             notes = values[0].replace("<", "").replace(">", "").strip().split(" ")
@@ -58,7 +61,7 @@ class ChordInfo:
             notes = [values[0]]
         if detection:
             clef, mode = detection.split("|")
-            notes = list(map(get_note, notes))
+            notes = [get_note(x, *clef.split('v')) for x in notes]
         dynamic = values[1] if (len(values) > 1 and values[1]) else None
         technique = values[2] if (len(values) > 2 and values[2]) else None
-        return (instrument, notes, dynamic, technique)
+        return (instrument, clef, notes, dynamic, technique)

@@ -86,27 +86,27 @@ class TestParseInstrument:
         "line, result",
         [
             pytest.param(
-                "picc.:D6|fff", ("picc.", ["D6"], "fff", None), id="Piccolo_D5_fff"
+                "picc.:D6|fff", ("picc.", "treble", ["D6"], "fff", None), id="Piccolo_D5_fff"
             ),
             pytest.param(
                 "flute:<F#5 A5>|fff",
-                ("flute", ["F#5", "A5"], "fff", None),
+                ("flute", "treble", ["F#5", "A5"], "fff", None),
                 id="Flute_F#5-A5_fff",
             ),
             pytest.param(
                 "oboes:<F#4 A4>|fff|fermata",
-                ("oboes", ["F#4", "A4"], "fff", "fermata"),
+                ("oboes", "treble", ["F#4", "A4"], "fff", "fermata"),
                 id="Oboes_F#4-A4_fff_fermata",
             ),
             pytest.param(
                 "clarinets:<D4 D5>||fermata",
-                ("clarinets", ["D4", "D5"], None, "fermata"),
+                ("clarinets", "treble", ["D4", "D5"], None, "fermata"),
                 id="Clarinets_D4-D5_fermata",
             ),
             pytest.param(
-                "flute:||fermata", ("flute", [""], None, "fermata"), id="No_notes==rest"
+                "flute:||fermata", ("flute", "treble", [""], None, "fermata"), id="No_notes==rest"
             ),
-            pytest.param("flute:", ("flute", [""], None, None), id="No_value==rest"),
+            pytest.param("flute:", ("flute", "treble", [""], None, None), id="No_value==rest"),
         ],
     )
     def test_parse_instrument_direct(self, line, result):
@@ -117,9 +117,24 @@ class TestParseInstrument:
         [
             pytest.param(
                 "harp-rh:{treble|}<D F# A D'>",
-                ('harp-rh', ['D4', 'F#4', 'A4', 'D5'], None, None),
+                ('harp-rh', "treble", ['D4', 'F#4', 'A4', 'D5'], None, None),
                 id="Treble_No_transposition"
-            )
+            ),
+            pytest.param(
+                "harp-lh:{bass|}<D F# A D'>",
+                ('harp-lh', "bass", ['D2', 'F#2', 'A2', 'D3'], None, None),
+                id="Bass_No_transposition"
+            ),
+            pytest.param(
+                "vln.I:{tva8|}<D D'>",
+                ('vln.I', "tva8", ['D5', 'D6'], None, None),
+                id="vb8_No_transposition"
+            ),
+            pytest.param(
+                "bass:{fvb8|}<D D'>",
+                ('bass', "fvb8", ['D1', 'D2'], None, None),
+                id="vb8_No_transposition"
+            ),
         ],
     )
     def test_parse_instrument_detection(self, line, result):
