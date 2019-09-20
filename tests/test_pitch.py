@@ -119,6 +119,7 @@ class TestPitchClass:
     )
     def test__eq__(self, base, other):
         assert Pitch(base) == Pitch(other)
+        assert not Pitch(base) != Pitch(other)
 
     @pytest.mark.parametrize(
         "base, interval, result",
@@ -218,6 +219,7 @@ class TestIntervalClass:
     )
     def test__eq__(self, base, other):
         assert Interval(*base) == Interval(*other)
+        assert not Interval(*base) != Interval(*other)
 
     @pytest.mark.parametrize(
         "base, other, result",
