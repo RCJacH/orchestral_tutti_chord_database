@@ -120,6 +120,17 @@ class TestPitchClass:
     def test__eq__(self, base, other):
         assert Pitch(base) == Pitch(other)
 
+    @pytest.mark.parametrize(
+        "base, interval, result",
+        [
+            pytest.param("C", "b3", 'Eb', id="C_tranpose_to_Eb"),
+            pytest.param("A", "5", 'E', id="A_transpose_to_E"),
+            pytest.param("Db", '#2', "E", id="Db_transpose_to_E"),
+            pytest.param("B#", 'b2', "C#", id="B#_transpose_to_C#"),
+        ],
+    )
+    def test_transpose(self, base, interval, result):
+        assert Pitch(base).transpose(interval) == Pitch(result)
 
 class TestIntervalClass:
     @pytest.mark.parametrize("numbers", [(1, 0), (2, -1), (4, 1), (5, -1), (7, -2)])

@@ -71,6 +71,16 @@ class Pitch:
             a.append(pitch_class + get_accidental(diff))
         return sorted(a, key=sortlist)
 
+    def transpose(self, interval):
+        if isinstance(interval, str):
+            interval = Interval(interval)
+        pitch_class_index = (self.pitch_class_index + interval.quantity - 1) % 7
+        pitch_class = PITCHCLASSES[pitch_class_index]
+        diff = self.index - PITCHID[pitch_class_index]
+        diff += -12 if diff > 3 else 12 if diff < -3 else 0
+        accidental = get_accidental(abs(interval) + diff)
+        return Pitch(pitch_class + accidental)
+
 
 class Interval:
     def __init__(self, lower, upper=None):
