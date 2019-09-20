@@ -165,11 +165,26 @@ class TestIntervalClass:
 
     @pytest.mark.parametrize(
         "interval, result",
-        [("b3", 3), ("5", 7), ("#4", 6), ("bb7", 9), ('#9', 15), ('b13', 20)],
+        [("b3", 3), ("5", 7), ("#4", 6), ("bb7", 9), ("#9", 15), ("b13", 20)],
     )
     def test__abs__(self, interval, result):
-        obj = Interval(interval)
-        assert abs(obj) == result
+        assert abs(Interval(interval)) == result
+
+    @pytest.mark.parametrize(
+        "interval, result",
+        [
+            ("b3", (6, 0)),
+            ("5", (4, 0)),
+            ("#4", (5, -1)),
+            ("bb7", (2, 1)),
+            ('#1', (8, -1)),
+            ('#3', (6, -2)),
+        ],
+    )
+    def test__neg__(self, interval, result):
+        obj = -Interval(interval)
+        assert (obj.quantity, obj.quality) == result
+
 
 # class TestIntervalsClass:
 #     def test_triad_inversion(self, tuplets, result):

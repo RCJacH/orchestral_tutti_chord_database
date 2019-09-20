@@ -86,7 +86,16 @@ class Interval:
 
     def __abs__(self):
         pitch_class_index = self.quantity - 1
-        return (pitch_class_index // 7) * 12 + PITCHID[pitch_class_index % 7] + self.quality
+        return (
+            (pitch_class_index // 7) * 12
+            + PITCHID[pitch_class_index % 7]
+            + self.quality
+        )
+
+    def __neg__(self):
+        quantity = 9 - (self.quantity - 1) % 7 - 1
+        quality = -self.quality if quantity in (1, 4, 5, 8) else -1 - self.quality
+        return Interval(quantity, quality)
 
     @staticmethod
     def interpret(interval):
