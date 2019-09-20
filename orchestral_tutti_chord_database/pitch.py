@@ -97,6 +97,9 @@ class Interval:
         quality = -self.quality if quantity in (1, 4, 5, 8) else -1 - self.quality
         return Interval(quantity, quality)
 
+    def __eq__(self, other):
+        return abs(self) == abs(other)
+
     @staticmethod
     def interpret(interval):
         accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]

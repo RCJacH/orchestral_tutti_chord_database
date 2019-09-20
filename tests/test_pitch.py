@@ -173,18 +173,28 @@ class TestIntervalClass:
     @pytest.mark.parametrize(
         "interval, result",
         [
-            ("b3", (6, 0)),
-            ("5", (4, 0)),
-            ("#4", (5, -1)),
-            ("bb7", (2, 1)),
-            ('#1', (8, -1)),
-            ('#3', (6, -2)),
+            pytest.param("b3", (6, 0), id="b3"),
+            pytest.param("5", (4, 0), id="5"),
+            pytest.param("#4", (5, -1), id="#4"),
+            pytest.param("bb7", (2, 1), id="bb7"),
+            pytest.param('#1', (8, -1), id='#1'),
+            pytest.param('#3', (6, -2), id='#3'),
         ],
     )
     def test__neg__(self, interval, result):
         obj = -Interval(interval)
         assert (obj.quantity, obj.quality) == result
 
+    @pytest.mark.parametrize(
+        "interval, other",
+        [
+            pytest.param((3, 1), (4, 0), id="#3==4"),
+            pytest.param((4, 1), (5, -1), id="#4==b5"),
+            pytest.param((9, -1), (8, 1), id="b9==#8"),
+        ],
+    )
+    def test__eq__(self, interval, other):
+        assert Interval(*interval) == Interval(*other)
 
 # class TestIntervalsClass:
 #     def test_triad_inversion(self, tuplets, result):
