@@ -102,7 +102,12 @@ class Interval:
 
     def __add__(self, other):
         quantity = self.quantity + other.quantity - 1
-        quality = (abs(self) + abs(other))%12 - PITCHID[(quantity-1)%7]
+        quality = (abs(self) + abs(other)) % 12 - PITCHID[(quantity - 1) % 7]
+        return Interval(quantity, quality)
+
+    def __sub__(self, other):
+        quantity = self.quantity - other.quantity + 1
+        quality = (abs(self) - abs(other)) % 12 - PITCHID[(quantity - 1) % 7]
         return Interval(quantity, quality)
 
     @staticmethod

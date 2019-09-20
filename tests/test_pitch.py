@@ -177,8 +177,8 @@ class TestIntervalClass:
             pytest.param("5", (4, 0), id="5"),
             pytest.param("#4", (5, -1), id="#4"),
             pytest.param("bb7", (2, 1), id="bb7"),
-            pytest.param('#1', (8, -1), id='#1'),
-            pytest.param('#3', (6, -2), id='#3'),
+            pytest.param("#1", (8, -1), id="#1"),
+            pytest.param("#3", (6, -2), id="#3"),
         ],
     )
     def test__neg__(self, interval, result):
@@ -199,18 +199,36 @@ class TestIntervalClass:
     @pytest.mark.parametrize(
         "base, other, result",
         [
-            pytest.param('3', 'b3', (5, 0), id="3+b3==5"),
-            pytest.param('2', 'b2', (3, -1), id="2+b2==b3"),
-            pytest.param('4', '#2', (5, 1), id="4+#2==#5"),
-            pytest.param('7', '3', (9, 1), id="7+3==#9"),
-            pytest.param('6', 'b3', (8, 0), id="6+b3==8"),
-            pytest.param('#11', 'b3', (13, 0), id="#11+b3==13"),
-            pytest.param('1', '#1', (1, 1), id="1+#1==#1"),
+            pytest.param("3", "b3", (5, 0), id="3+b3==5"),
+            pytest.param("2", "b2", (3, -1), id="2+b2==b3"),
+            pytest.param("4", "#2", (5, 1), id="4+#2==#5"),
+            pytest.param("7", "3", (9, 1), id="7+3==#9"),
+            pytest.param("6", "b3", (8, 0), id="6+b3==8"),
+            pytest.param("#11", "b3", (13, 0), id="#11+b3==13"),
+            pytest.param("1", "#1", (1, 1), id="1+#1==#1"),
         ],
     )
-    def test__eq__(self, base, other, result):
+    def test__add__(self, base, other, result):
         obj = Interval(base) + Interval(other)
         assert (obj.quantity, obj.quality) == result
+
+    @pytest.mark.parametrize(
+        "base, other, result",
+        [
+            pytest.param("5", "b3", (3, 0), id="5-b3==3"),
+            pytest.param("3", "2", (2, 0), id="3-2==2"),
+            pytest.param("#5", "4", (2, 1), id="#5-4==#2"),
+            pytest.param("#9", "b7", (3, 1), id="#9-b7==#3"),
+            pytest.param("8", "6", (3, -1), id="8-6==b3"),
+            pytest.param("13", "b3", (11, 1), id="13-b3==#11"),
+            pytest.param("2", "#1", (2, -1), id="2-#1==b2"),
+        ],
+    )
+    def test__sub__(self, base, other, result):
+        obj = Interval(base) - Interval(other)
+        assert (obj.quantity, obj.quality) == result
+
+
 # class TestIntervalsClass:
 #     def test_triad_inversion(self, tuplets, result):
 #         for each in tuplets:
