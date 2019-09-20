@@ -125,10 +125,16 @@ class Interval:
         quality = (abs(self) - abs(other)) % 12 - PITCHID[(quantity - 1) % 7]
         return Interval(quantity, quality)
 
-    @staticmethod
-    def interpret(interval):
+    def interpret(self, interval):
         accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]
-        return (int(degree), get_accidental_index(accidental))
+        quantity, quality = int(degree), get_accidental_index(accidental)
+        if interval[0] == '-':
+            return self.inversion(quantity, quality)
+        else:
+            return (quantity, quality)
+
+    def values(self):
+        return (self.quantity, self.quality)
 
     @staticmethod
     def detect_interval(lower, upper):
