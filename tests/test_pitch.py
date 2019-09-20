@@ -147,8 +147,8 @@ class TestIntervalClass:
     )
     def test_single_interval(self, pairs, result):
         for each in pairs:
-            assert Interval.detect_interval(*each) == result
-
+            obj = Interval(*each)
+            assert (obj.quantity, obj.quality) == result
 
 class TestInterval:
     class TestIntervals:

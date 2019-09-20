@@ -75,6 +75,11 @@ class Pitch:
         return sorted(a, key=sortlist)
 
 class Interval:
+
+    def __init__(self, lower, upper):
+        self.quantity, self.quality = detect_interval(lower, upper)
+
+    @staticmethod
     def detect_interval(lower, upper):
         if type(lower) is str:
             lower = Pitch(lower)
