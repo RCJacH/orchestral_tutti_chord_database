@@ -70,23 +70,31 @@ class Pitch:
         a = []
         for each in pitch_classes_index:
             pitch_class = PITCHCLASSES[each]
-            diff = self.index - PITCHID[each]
-            diff += -12 if diff > 3 else 12 if diff < -3 else 0
+            diff = self.diff(each)
             if abs(diff) > 2:
                 continue
             a.append(pitch_class + get_accidental(diff))
         return sorted(a, key=sortlist)
 
     def transpose(self, interval):
+        descending = False
         if isinstance(interval, str):
+            if interval[0] == '-':
+                descending = True
+                interval = interval.replace('-', '')
             interval = Interval(interval)
-        pitch_class_index = (self.pitch_class_index + interval.quantity - 1) % 7
+        if descending:
+            pitch_class_index = (self.pitch_class_index - interval.quantity + 1) % 7
+        else:
+            pitch_class_index = (self.pitch_class_index + interval.quantity - 1) % 7
         pitch_class = PITCHCLASSES[pitch_class_index]
-        diff = self.index - PITCHID[pitch_class_index]
-        diff += -12 if diff > 3 else 12 if diff < -3 else 0
-        accidental = get_accidental(abs(interval) + diff)
+        accidental = get_accidental(abs(interval) + self.diff(pitch_class_index))
         return Pitch(pitch_class + accidental)
 
+    def diff(self, new_index, class_only=True):
+        diff = self.index - (PITCHID[new_index] if class_only else new_index)
+        diff += -12 if diff > 3 else 12 if diff < -3 else 0
+        return diff
 
 class Interval:
     def __init__(self, lower, upper=None):

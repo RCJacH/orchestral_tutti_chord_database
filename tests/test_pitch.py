@@ -128,6 +128,8 @@ class TestPitchClass:
             pytest.param("A", "5", "E", id="A_transpose_to_E"),
             pytest.param("Db", "#2", "E", id="Db_transpose_to_E"),
             pytest.param("B#", "b2", "C#", id="B#_transpose_to_C#"),
+            pytest.param("C", "-2", "Bb", id="C_transpose_down_to_Bb"),
+            pytest.param("Db", "-b4", "A#", id="Db_transpose_down_to_A#"),
         ],
     )
     def test_transpose(self, base, interval, result):
