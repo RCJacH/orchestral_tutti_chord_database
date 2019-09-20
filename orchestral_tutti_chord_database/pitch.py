@@ -106,7 +106,7 @@ class Interval:
         )
 
     def __neg__(self):
-        quantity, quality = self.inversion(self.quantity, self.quality)
+        quantity, quality = self.inversion(self.quantity, self.quality).values()
         return Interval(quantity, quality)
 
     def __eq__(self, other):
@@ -125,16 +125,13 @@ class Interval:
         quality = (abs(self) - abs(other)) % 12 - PITCHID[(quantity - 1) % 7]
         return Interval(quantity, quality)
 
+    def values(self):
+        return (self.quantity, self.quality)
+
     def interpret(self, interval):
         accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]
         quantity, quality = int(degree), get_accidental_index(accidental)
-        if interval[0] == '-':
-            return self.inversion(quantity, quality)
-        else:
-            return (quantity, quality)
-
-    def values(self):
-        return (self.quantity, self.quality)
+        return (quantity, quality)
 
     @staticmethod
     def detect_interval(lower, upper):
@@ -150,7 +147,7 @@ class Interval:
     def inversion(quantity, quality):
         quantity = 9 - (quantity - 1) % 7 - 1
         quality = -quality if quantity in (1, 4, 5, 8) else -1 - quality
-        return (quantity, quality)
+        return Interval(quantity, quality)
 
 class Intervals:
     @staticmethod
