@@ -74,6 +74,15 @@ class Pitch:
             a.append(pitch_class + get_accidental(diff))
         return sorted(a, key=sortlist)
 
+class Interval:
+    def detect_interval(lower, upper):
+        if type(lower) is str:
+            lower = Pitch(lower)
+        if type(upper) is str:
+            upper = Pitch(upper)
+        quantity = (upper.pitch_class_index - lower.pitch_class_index) % 7
+        quality = (upper.index - lower.index) % 12 - PITCHID[quantity]
+        return (quantity + 1, quality)
 
 def detect_interval(lower, upper):
     if type(lower) is str:

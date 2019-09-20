@@ -1,6 +1,6 @@
 import pytest
 from orchestral_tutti_chord_database import pitch
-from orchestral_tutti_chord_database.pitch import Pitch
+from orchestral_tutti_chord_database.pitch import Pitch, Interval
 
 
 class TestAccidental:
@@ -109,48 +109,48 @@ class TestPitchClass:
             assert obj.enharmonics() == enharmonics
 
 
+class TestIntervalClass:
+    @pytest.mark.parametrize(
+        "pairs, result",
+        [
+            pytest.param(
+                [("C", "D"), ("D", "E"), ("F", "G"), ("G", "A"), ("A", "B")],
+                (2, 0),
+                id="natural_j2",
+            ),
+            pytest.param([("C", "E"), ("F", "A"), ("G", "B")], (3, 0), id="natural_j3"),
+            pytest.param(
+                [("C", "A"), ("D", "B"), ("F", "D"), ("G", "E")],
+                (6, 0),
+                id="natural_j6",
+            ),
+            pytest.param([("C", "B"), ("F", "E")], (7, 0), id="natural_j7"),
+            pytest.param(
+                [("C#", "B"), ("D#", "C#"), ("Fb", "Ebb")], (7, -1), id="accidental_b7"
+            ),
+            pytest.param(
+                [("C#", "Bb"), ("D#", "C"), ("F", "Ebb"), ("A", "Gb"), ("B#", "A")],
+                (7, -2),
+                id="accidental_bb7",
+            ),
+            pytest.param(
+                [("G", "Eb"), ("Bb", "Gb"), ("C#", "A"), ("Dx", "B#")],
+                (6, -1),
+                id="accidental_m6",
+            ),
+            pytest.param(
+                [("A", "C#"), ("Bb", "D"), ("Db", "F"), ("E", "G#")],
+                (3, 0),
+                id="accidental_j3",
+            ),
+        ],
+    )
+    def test_single_interval(self, pairs, result):
+        for each in pairs:
+            assert Interval.detect_interval(*each) == result
+
+
 class TestInterval:
-    class TestSingleInterval:
-        def test_natural_major_seconds(self):
-            assert (
-                pitch.detect_interval("C", "D")
-                == pitch.detect_interval("D", "E")
-                == pitch.detect_interval("F", "G")
-                == pitch.detect_interval("G", "A")
-                == pitch.detect_interval("A", "B")
-                == (2, 0)
-            )
-
-        def test_natural_major_thirds(self):
-            assert (
-                pitch.detect_interval("C", "E")
-                == pitch.detect_interval("F", "A")
-                == pitch.detect_interval("G", "B")
-                == (3, 0)
-            )
-
-        def test_natural_major_six(self):
-            assert (
-                pitch.detect_interval("C", "A")
-                == pitch.detect_interval("D", "B")
-                == pitch.detect_interval("F", "D")
-                == pitch.detect_interval("G", "E")
-                == (6, 0)
-            )
-
-        def test_natural_major_seven(self):
-            assert (
-                pitch.detect_interval("C", "B")
-                == pitch.detect_interval("F", "E")
-                == (7, 0)
-            )
-
-        def test_accidental(self):
-            assert pitch.detect_interval("C#", "B") == (7, -1)
-            assert pitch.detect_interval("C#", "Bb") == (7, -2)
-            assert pitch.detect_interval("G", "Eb") == (6, -1)
-            assert pitch.detect_interval("A", "C#") == (3, 0)
-
     class TestIntervals:
         def test_Major_Root(self):
             assert (
@@ -373,7 +373,6 @@ class TestChordDetection:
         with pytest.raises(IndexError):
             assert pitch.detect_chord([])
 
-
     def test_major(self):
         assert pitch.detect_chord([("C", 0), ("G", 7), ("E", 16)]) == "C"
         assert pitch.detect_chord([("E", 28), ("C#", 61), ("A", 9)]) == "A"
@@ -383,4 +382,4 @@ class TestChordDetection:
         assert pitch.detect_chord([("F#", 42), ("B", 35), ("D", 38)]) == "Bm"
 
     # def test_ambiguous(self):
-        # assert pitch.detect_chord([('C', 0), ('C#', 0), ('D', 0)]) == None
+    # assert pitch.detect_chord([('C', 0), ('C#', 0), ('D', 0)]) == None
