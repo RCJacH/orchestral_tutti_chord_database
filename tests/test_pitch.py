@@ -100,19 +100,6 @@ class TestPitchClass:
         assert Pitch("G#").midinum == 56
 
     @pytest.mark.parametrize(
-        "pit, enharmonics",
-        [
-            pytest.param("C", ["C", "B#", "Dbb"], id="C_enharmonics"),
-            pytest.param("F#", ["F#", "Gb", "Ex"], id="F#_enharmonics"),
-            pytest.param("E#", ["E#", "F", "Gbb"], id="E#_enharmonics"),
-            pytest.param("Ab", ["Ab", "G#"], id="Ab_enharmonics"),
-        ],
-    )
-    def test_enharmonics(self, pit, enharmonics):
-        obj = Pitch(pit)
-        assert obj.enharmonics() == enharmonics
-
-    @pytest.mark.parametrize(
         "base, other",
         [
             pytest.param("C", "B#", id="C==B#"),
@@ -124,6 +111,19 @@ class TestPitchClass:
     def test__eq__(self, base, other):
         assert Pitch(base) == Pitch(other)
         assert not Pitch(base) != Pitch(other)
+
+    @pytest.mark.parametrize(
+        "pit, enharmonics",
+        [
+            pytest.param("C", ["C", "B#", "Dbb"], id="C_enharmonics"),
+            pytest.param("F#", ["F#", "Gb", "Ex"], id="F#_enharmonics"),
+            pytest.param("E#", ["E#", "F", "Gbb"], id="E#_enharmonics"),
+            pytest.param("Ab", ["Ab", "G#"], id="Ab_enharmonics"),
+        ],
+    )
+    def test_enharmonics(self, pit, enharmonics):
+        obj = Pitch(pit)
+        assert obj.enharmonics() == enharmonics
 
     @pytest.mark.parametrize(
         "base, interval, result",
@@ -143,6 +143,7 @@ class TestPitchClass:
         tester = Pitch(result)
         assert testee == tester
         assert testee.name == tester.name
+
 
 class TestIntervalClass:
     @pytest.mark.parametrize("numbers", [(1, 0), (2, -1), (4, 1), (5, -1), (7, -2)])

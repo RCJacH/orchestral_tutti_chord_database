@@ -78,15 +78,17 @@ class Pitch:
             else:
                 return abs(get_accidental_index(x[1:]))
 
-        pitch_classes_index = [(self.pitch_class_index + x) % 7 for x in range(-2, 3)]
-        a = []
-        for each in pitch_classes_index:
-            pitch_class = PITCHCLASSES[each]
-            diff = self.diff(each)
+        adjacent_indice = [x for x in range(-2, 3)]
+        enharmonics = []
+        for adjacent_index in adjacent_indice:
+            pitch_class_index = self.pitch_class_index + adjacent_index
+            pitch_class = PITCHCLASSES[pitch_class_index%7]
+            oct_diff = pitch_class_index//7
+            diff = self.diff(Pitch(pitch_class, self.octave + oct_diff))
             if abs(diff) > 2:
                 continue
-            a.append(pitch_class + get_accidental(diff))
-        return sorted(a, key=sortlist)
+            enharmonics.append(pitch_class + get_accidental(-diff))
+        return sorted(enharmonics, key=sortlist)
 
     def transpose(self, interval):
         descending = False
