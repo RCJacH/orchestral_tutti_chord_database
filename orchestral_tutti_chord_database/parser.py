@@ -8,21 +8,22 @@ class ChordInfo:
         "name",
         "movement",
         "measure",
+        "key",
         "tempo",
         "orchestra_size",
         "performer",
         "imslp",
         "chord",
     ]
-    short = ["c", "y", "o", "n", "m", "b", "t", "s", "p", "i", "h"]
+    short = ["c", "y", "o", "n", "m", "b", "k", "t", "s", "p", "i", "h"]
 
     clefs = {"treble": 4, "t": 4, "g": 4, "bass": 2, "f": 2, "c": 3, "alto": 3}
 
     def __init__(self):
-        pass
+        self.instruments = []
 
     def parse_line(self, line: str):
-        k, v = line.split(":")
+        k, v = line.split(":", 1)
         v = v.strip()
         if not v:
             return
@@ -30,7 +31,7 @@ class ChordInfo:
         if any(k not in x for x in (self.long, self.short)):
             setattr(self, *self.parse_info(k, v))
         else:
-            setattr(self, *self.parse_instrument(k, v))
+            self.instruments.append(k, self.parse_instrument(k, v))
 
     @classmethod
     def parse_info(cls, k: str, v: str) -> tuple:
@@ -39,7 +40,7 @@ class ChordInfo:
         if k == "composer":
             v = ",_".join(v.rsplit(" ", 1)[::-1])
         if k == "opus":
-            v = v.replace(" ", "").replace("Opus", "Op.")
+            v = v.replace(" ", "").replace("Opus", "Op. ")
         return (k, int(v) if v.lstrip("-").isdigit() else v)
 
     @classmethod

@@ -10,7 +10,7 @@ class TestParseInfo:
                 "composer", "Benjamin Britten", "Britten,_Benjamin", id="Composer"
             ),
             pytest.param("year", "1945", 1945, id="Year"),
-            pytest.param("opus", "Opus 34", "Op.34", id="Opus"),
+            pytest.param("opus", "Opus 34", "Op. 34", id="Opus"),
             pytest.param(
                 "name",
                 "The Young Person's Guide to the Orchestra",
@@ -33,7 +33,7 @@ class TestParseInfo:
                 "c", "composer", "Benjamin Britten", "Britten,_Benjamin", id="Composer"
             ),
             pytest.param("y", "year", "1945", 1945, id="Year"),
-            pytest.param("o", "opus", "Opus 34", "Op.34", id="Opus"),
+            pytest.param("o", "opus", "Opus 34", "Op. 34", id="Opus"),
             pytest.param(
                 "n",
                 "name",
@@ -43,6 +43,7 @@ class TestParseInfo:
             ),
             pytest.param("m", "movement", "Fugue", "Fugue", id="Movement"),
             pytest.param("b", "measure", "-1", -1, id="Measure"),
+            pytest.param("k", "key", "D", "D", id="Key"),
             pytest.param("t", "tempo", "Allegro molto", "Allegro molto", id="Tempo"),
             pytest.param("h", "chord", "D", "D", id="Chord"),
         ],
@@ -60,7 +61,7 @@ class TestParseInfo:
                 id="Composer:Britten",
             ),
             pytest.param("Year: 1945", "year", 1945, id="Year"),
-            pytest.param("Opus: Opus 34", "opus", "Op.34", id="Opus"),
+            pytest.param("Opus: Opus 34", "opus", "Op. 34", id="Opus"),
             pytest.param(
                 "Name: The Young Person's Guide to the Orchestra",
                 "name",
