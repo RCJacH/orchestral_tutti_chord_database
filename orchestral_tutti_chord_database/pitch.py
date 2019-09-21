@@ -2,6 +2,7 @@ import re
 
 PITCHCLASSES = "CDEFGAB"
 PITCHID = [0, 2, 4, 5, 7, 9, 11]
+DEFAULT_PITCH = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
 
 
 def get_accidental_index(accidental) -> int:
@@ -25,39 +26,50 @@ def get_accidental(i: int) -> str:
 
 
 class Pitch:
-    def __init__(self, in_str: str = "B", octave: int = 4):
+    def __init__(self, in_str="B", octave_in: int = 4):
+        octave = None
         if not in_str:
             raise IndexError("Pitch name cannot be empty.")
-        a = re.split("([0-9]+)", in_str)
-        pitch_name = a[0]
-        if len(a) > 1:
-            octave = int(a[1])
-        if pitch_name[0] in PITCHCLASSES:
-            self.set_properties(pitch_name)
-        elif pitch_name[0].isalpha():
-            self.set_properties(
-                chr((ord(pitch_name[0]) - 65) % 7 + 65) + pitch_name[1:]
-            )
+        if isinstance(in_str, int):
+            in_str = DEFAULT_PITCH[in_str % 12] + str(in_str // 12)
+        if isinstance(in_str, str):
+            try:
+                pitch_class, accidental, octave = re.findall(
+                    r"([A-Z])([#bx]*)?(\d*)?", in_str
+                )[0]
+                if pitch_class not in PITCHCLASSES:
+                    pitch_class = chr((ord(pitch_class) - 65) % 7 + 65)
+                self.set_properties(pitch_class, accidental)
+            except IndexError:
+                raise ValueError(f"No pitch class found in {in_str}.")
+        if not octave:
+            octave = octave_in
         else:
-            raise ValueError(f"No pitch class found in {pitch_name}.")
-        self.midinum: int = octave * 12 + self.index
+            octave = int(octave)
+        self.name = self.pitch_class + self.accidental
+        self.octave = octave
+        self.midinum: int = octave * 12 + PITCHID[
+            self.pitch_class_index
+        ] + self.accidental_index
 
     def __abs__(self):
-        return self.index
+        return self.midinum
 
     def __eq__(self, other):
-        return self.__abs__() % 12 == self.__abs__() % 12
+        return self.index == other.index
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def set_properties(self, pitch_name: str):
-        self.name: str = pitch_name
-        self.pitch_class: str = pitch_name[0]
-        self.pitch_class_index: int = PITCHCLASSES.index(self.pitch_class)
-        self.accidental: str = pitch_name[1:] if len(pitch_name) else ""
-        self.accidental_index: int = get_accidental_index(self.accidental)
-        self.index: int = PITCHID[self.pitch_class_index] + self.accidental_index
+    def __str__(self):
+        return self.name + str(self.octave)
+
+    def set_properties(self, pitch_class: str, accidental: str):
+        self.pitch_class: str = pitch_class
+        self.pitch_class_index: int = PITCHCLASSES.index(pitch_class)
+        self.accidental: str = accidental
+        self.accidental_index: int = get_accidental_index(accidental)
+        self.index: int = (PITCHID[self.pitch_class_index] + self.accidental_index) % 12
 
     def enharmonics(self) -> list:
         def sortlist(x):
@@ -79,22 +91,34 @@ class Pitch:
     def transpose(self, interval):
         descending = False
         if isinstance(interval, str):
-            if interval[0] == '-':
+            if interval[0] == "-":
                 descending = True
-                interval = interval.replace('-', '')
+                interval = interval.replace("-", "")
             interval = Interval(interval)
         if descending:
             pitch_class_index = (self.pitch_class_index - interval.quantity + 1) % 7
         else:
             pitch_class_index = (self.pitch_class_index + interval.quantity - 1) % 7
+        oct_diff = (
+            PITCHID[self.pitch_class_index]
+            + self.accidental_index
+            + abs(interval) * (-1 if descending else 1)
+        ) // 12
+        octave = self.octave + oct_diff
         pitch_class = PITCHCLASSES[pitch_class_index]
-        accidental = get_accidental(abs(interval) + self.diff(pitch_class_index))
-        return Pitch(pitch_class + accidental)
+        new_pitch_class = Pitch(pitch_class, octave)
+        diff = self.diff(new_pitch_class, descending=descending)
+        accidental_index = (-abs(interval) if descending else abs(interval)) - diff
+        accidental = get_accidental(accidental_index)
+        return Pitch(pitch_class + accidental + str(octave))
 
-    def diff(self, new_index, class_only=True):
-        diff = self.index - (PITCHID[new_index] if class_only else new_index)
-        diff += -12 if diff > 3 else 12 if diff < -3 else 0
+    def diff(self, other, class_only=True, descending=False):
+        self_index = PITCHID[self.pitch_class_index] + self.accidental_index
+        other_index = PITCHID[other.pitch_class_index] if class_only else other.index
+        diff = other_index - self_index
+        diff += 12 * (other.octave - self.octave)
         return diff
+
 
 class Interval:
     def __init__(self, lower, upper=None):
@@ -137,7 +161,7 @@ class Interval:
         return (self.quantity, self.quality)
 
     def interpret(self, interval):
-        accidental, degree = re.findall("([#xb]*)([0-9]+)", interval)[0]
+        accidental, degree = re.findall(r"([#xb]*)(\d+)", interval)[0]
         quantity, quality = int(degree), get_accidental_index(accidental)
         return (quantity, quality)
 
@@ -156,6 +180,7 @@ class Interval:
         quantity = 9 - (quantity - 1) % 7 - 1
         quality = -quality if quantity in (1, 4, 5, 8) else -1 - quality
         return Interval(quantity, quality)
+
 
 class Intervals:
     @staticmethod

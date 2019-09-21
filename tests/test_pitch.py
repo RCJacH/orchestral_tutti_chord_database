@@ -58,6 +58,10 @@ class TestPitchClass:
         with pytest.raises(ValueError, match="No pitch class"):
             Pitch("#b")
 
+    def test_nonsense(self):
+        with pytest.raises(ValueError, match="No pitch class"):
+            Pitch("aspdu23")
+
     @pytest.mark.parametrize(
         "pit, keys",
         [
@@ -127,14 +131,18 @@ class TestPitchClass:
             pytest.param("C", "b3", "Eb", id="C_tranpose_to_Eb"),
             pytest.param("A", "5", "E", id="A_transpose_to_E"),
             pytest.param("Db", "#2", "E", id="Db_transpose_to_E"),
-            pytest.param("B#", "b2", "C#", id="B#_transpose_to_C#"),
-            pytest.param("C", "-2", "Bb", id="C_transpose_down_to_Bb"),
-            pytest.param("Db", "-b4", "A#", id="Db_transpose_down_to_A#"),
+            pytest.param("B#", "b2", "C#5", id="B#_transpose_to_C#"),
+            pytest.param("B#4", "bb11", "Eb6", id="B#_transpose_to_Eb"),
+            pytest.param("C", "-2", "Bb3", id="C_transpose_down_to_Bb"),
+            pytest.param("Db5", "-bb4", "A#4", id="Db_transpose_down_to_A#"),
+            pytest.param("Gb5", "-b13", "Bb3", id="Db_transpose_down_to_A#"),
         ],
     )
     def test_transpose(self, base, interval, result):
-        assert Pitch(base).transpose(interval) == Pitch(result)
-
+        testee = Pitch(base).transpose(interval)
+        tester = Pitch(result)
+        assert testee == tester
+        assert testee.name == tester.name
 
 class TestIntervalClass:
     @pytest.mark.parametrize("numbers", [(1, 0), (2, -1), (4, 1), (5, -1), (7, -2)])
