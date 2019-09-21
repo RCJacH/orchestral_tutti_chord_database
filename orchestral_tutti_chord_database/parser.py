@@ -45,17 +45,20 @@ class ChordInfo:
     @classmethod
     def parse_instrument(cls, instrument: str, v: str) -> tuple:
         def get_note(note, transpose, clef, adj=''):
-            number: int = note.count("'") - note.count(",")
+            octave: int = note.count("'") - note.count(",")
             if clef in cls.clefs:
-                number += cls.clefs[clef]
+                octave += cls.clefs[clef]
             if adj != '':
-                number += int(adj.replace("a", "").replace("b", "-"))//8
-            note = note.replace("'", "").replace(",", "")
+                octave += int(adj.replace("a", "").replace("b", "-"))//8
+            pitch_name = note.replace("'", "").replace(",", "")
+            note = Pitch(pitch_name, octave)
             if 'a' in transpose:
                 pass
             elif transpose != '':
-                note = Pitch(note).transpose(transpose).name
-            return note + str(number)
+                transposed = note.transpose(transpose)
+                pitch_name = transposed.name
+                octave = transposed.octave
+            return pitch_name + str(octave)
 
         detection = None
         clef = "treble"
