@@ -98,6 +98,12 @@ class TestPitchClass:
 
     def test_midinum_default_octave(self):
         assert Pitch("G#").midinum == 56
+        assert Pitch("C").octave == 4
+        assert Pitch("B#").octave == 4
+
+    def test_input_by_midinum(self):
+        assert str(Pitch(48)) == "C4"
+        assert str(Pitch(70)) == "Bb5"
 
     @pytest.mark.parametrize(
         "base, other",
