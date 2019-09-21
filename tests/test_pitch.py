@@ -94,7 +94,7 @@ class TestPitchClass:
         ],
     )
     def test_midinum(self, s, i, midi):
-        assert Pitch(s, i).midinum == midi
+        assert abs(Pitch(s, i)) == midi
 
     def test_midinum_default_octave(self):
         assert Pitch("G#").midinum == 56
