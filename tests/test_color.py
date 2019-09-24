@@ -1,5 +1,8 @@
 import pytest
-from orchestral_tutti_chord_database.color import make_swatches
+from orchestral_tutti_chord_database.color import (
+    make_swatches,
+    pitch_class_index_to_hue,
+)
 
 
 @pytest.mark.parametrize(
@@ -31,4 +34,32 @@ def test_make_swatches_hex():
         "#FFFFFF",
         "#7974CA",
         "#000000",
+    ]
+
+
+def test_note_to_color():
+    assert [
+        make_swatches(
+            start=midinum_to_hue(i),
+            rotations=0,
+            numbers=3,
+            min_sat=1,
+            max_sat=2,
+            reverse=True,
+            hex=True,
+        )[1]
+        for i in range(12)
+    ] == [
+        "#39AC50",
+        "#359AB5",
+        "#5385D4",
+        "#7871DD",
+        "#9B61D5",
+        "#B557C3",
+        "#CF5297",
+        "#CC6050",
+        "#B77133",
+        "#988423",
+        "#7F9121",
+        "#619E2A",
     ]
