@@ -12,6 +12,7 @@ def make_swatches(
     min_light=0.0,
     max_light=1.0,
     reverse=False,
+    float=False,
     hex=False,
 ) -> list:
 
@@ -43,13 +44,16 @@ def make_swatches(
     ).T
 
     # Clip and normalize to 8bit
-    color_list = (255 * np.clip(transformed_color, 0.0, 1.0)).astype(np.uint8)
+    if not float:
+        color_list = (255 * np.clip(transformed_color, 0.0, 1.0)).astype(np.uint8)
+    else:
+        color_list = np.clip(transformed_color, 0.0, 1.0)
 
     # Reverse the color list if requested
     if reverse:
         color_list = color_list[::-1]
 
-    if hex:
+    if hex and not float:
         color_list = [
             "#" + "".join(map(lambda i: "{0:#0{1}X}".format(i, 4)[2:], x))
             for x in color_list
