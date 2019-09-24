@@ -63,7 +63,7 @@ def make_swatches(
 
 
 def pitch_class_index_to_hue(midinum):
-    hue_range = [120, 185, 214, 240, 264, 284, 315, 0, 24, 48, 65, 85]
+    hue_range = [0, 24, 48, 65, 85, 120, 185, 214, 240, 264, 284, 315]
     return hue_range[midinum % 12]/120
 
 ratios = [

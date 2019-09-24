@@ -40,7 +40,7 @@ def test_make_swatches_hex():
 def test_note_to_color():
     assert [
         make_swatches(
-            start=midinum_to_hue(i),
+            start=pitch_class_index_to_hue(i),
             rotations=0,
             numbers=3,
             min_sat=1,
@@ -50,6 +50,11 @@ def test_note_to_color():
         )[1]
         for i in range(12)
     ] == [
+        "#CC6050",
+        "#B77133",
+        "#988423",
+        "#7F9121",
+        "#619E2A",
         "#39AC50",
         "#359AB5",
         "#5385D4",
@@ -57,9 +62,23 @@ def test_note_to_color():
         "#9B61D5",
         "#B557C3",
         "#CF5297",
-        "#CC6050",
-        "#B77133",
-        "#988423",
-        "#7F9121",
-        "#619E2A",
     ]
+
+
+def test_d():
+    print(
+        make_swatches(
+            start=pitch_class_index_to_hue(0),
+            rotations=1,
+            numbers=21,
+            min_sat=1,
+            max_sat=2,
+            min_light=0.2,
+            max_light=0.90,
+            float=True,
+        )
+    )
+    # for i in range(12):
+    # print(make_swatches(start=pitch_class_index_to_hue(i), rotations=0.75, numbers=3, min_sat=1, max_sat=2, min_light=0.2, max_light=0.9, float=True)[1])
+    # print([tuple(x) for x in make_swatches(start=pitch_class_index_to_hue(2), rotations=0.75, numbers=17, min_sat=1, max_sat=2, min_light=0.2, max_light=0.9,float=True)])
+    assert 0
