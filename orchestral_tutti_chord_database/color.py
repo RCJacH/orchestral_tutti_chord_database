@@ -4,7 +4,7 @@ from math import pi
 
 
 def make_swatches(
-    start_color=0.5,
+    start=0.5,
     rotations=0,
     min_sat=1.2,
     max_sat=1.2,
@@ -13,10 +13,11 @@ def make_swatches(
     min_light=0.0,
     max_light=1.0,
     reverse=False,
-    returnhex=False,
+    hex=False,
 ) -> list:
+
     # Clip some of the passed values into ranges that make sense.
-    start_color = np.clip(start_color, 0.0, 3.0)
+    start = np.clip(start, 0.0, 3.0)
     min_sat = np.clip(min_sat, 0, 2)
     max_sat = np.clip(max_sat, 0, 2)
     min_light = np.clip(min_light, 0, 2)
@@ -25,7 +26,7 @@ def make_swatches(
 
     # Define transform scalars
     fract = np.linspace(min_light, max_light, numbers)
-    phi = 2.0 * pi * ((start_color + 1) / 3.0 + rotations * fract)
+    phi = 2.0 * pi * ((start + 1) / 3.0 + rotations * fract)
     fract **= gamma
 
     satar = np.linspace(min_sat, max_sat, numbers)
@@ -49,8 +50,11 @@ def make_swatches(
     if reverse:
         color_list = color_list[::-1]
 
-    if returnhex:
-        color_list = [lambda x: "{0:#0{1}X}".format(x, 4)[2:] for x in color_list]
+    if hex:
+        color_list = [
+            "#" + "".join(map(lambda i: "{0:#0{1}X}".format(i, 4)[2:], x))
+            for x in color_list
+        ]
 
     return color_list
 
@@ -153,7 +157,7 @@ def resonant_color(freq):
         lightOctave += 1
 
     lightfreqTHz = lightfreq / 1000000000000
-    lightWavelength = wavelength(lightfreq)
+    lightWavelength = wavelength(lightfreqTHz)
     lightWavelengthNM = lightWavelength * 1000000000
 
     return color_from_wavelength(lightWavelengthNM)
