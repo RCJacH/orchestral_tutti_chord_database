@@ -6,6 +6,7 @@ DEFAULT_PITCH = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B"
 
 
 def get_accidental_index(accidental) -> int:
+    """Returns the index of accidental string, e.g. #->1."""
     if not accidental or type(accidental) != str:
         return 0
     if not all(x in "#bx" for x in accidental):
@@ -17,6 +18,7 @@ def get_accidental_index(accidental) -> int:
 
 
 def get_accidental(i: int) -> str:
+    """Returns the accidental string from its index, e.g. 1->#."""
     s = ""
     if i > 0:
         s = "x" * (i // 2) + "#" * (i % 2)
