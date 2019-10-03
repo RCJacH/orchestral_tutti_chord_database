@@ -197,7 +197,14 @@ class TestIntervalClass:
 
     @pytest.mark.parametrize(
         "interval, result",
-        [("b3", (3, -1)), ("5", (5, 0)), ("#4", (4, 1)), ("bb7", (7, -2))],
+        [
+            ("b3", (3, -1)),
+            ("5", (5, 0)),
+            ("#4", (4, 1)),
+            ("bb7", (7, -2)),
+            ("bb3", (3, -2)),
+            ("b1", (1, -1)),
+        ],
     )
     def test_interpret(self, interval, result):
         assert Interval(interval).values() == result
