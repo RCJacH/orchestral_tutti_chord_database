@@ -7,15 +7,36 @@ def make_swatches(
     rotations=0,
     min_sat=1.2,
     max_sat=1.2,
-    gamma=1.0,
-    numbers=256.0,
     min_light=0.0,
     max_light=1.0,
+    gamma=1.0,
+    numbers=256.0,
     reverse=False,
     float=False,
     hex=False,
 ) -> list:
+    """Generates a list of RGB values with the cubehelix color scheme.
+    
+    Cubehelix is intended to create color schemes spanning from black
+    to white, traversing through red, green, and blue using a tapered
+    helix in the colour cube with increasing perceived intensity. See
+    http://www.mrao.cam.ac.uk/~dag/CUBEHELIX/
 
+    Args:
+        start: The central hue at the middle of the scheme, ranging
+            from 0.0 to 3.0.
+        rotations: Deviation from the central hue with rotations of the
+            helix. Defaults to 0 being monochrome. Can be negative.
+        min_sat: The saturation at the start of the scheme.
+        max_sat: The saturation at the end of the scheme.
+        min_light: The lightness at the start of the scheme.
+        max_light: The lightness at the end of the scheme.
+        gamma: Emphasis of low or high intensity.
+        numbers: The number of colors within the scheme.
+        reverse: Return color list reversed.
+        float: Convert return values to float rather than 8-bit int.
+        hex: Convert none-float values to #xxxxxx format.
+    """
     # Clip some of the passed values into ranges that make sense.
     start = np.clip(start, 0.0, 3.0)
     min_sat = np.clip(min_sat, 0, 2)
@@ -46,6 +67,11 @@ def make_swatches(
     # Clip and normalize to 8bit
     if not float:
         color_list = (255 * np.clip(transformed_color, 0.0, 1.0)).astype(np.uint8)
+        if hex:
+            color_list = [
+                "#" + "".join(map(lambda i: "{0:#0{1}X}".format(i, 4)[2:], x))
+                for x in color_list
+            ]
     else:
         color_list = np.clip(transformed_color, 0.0, 1.0)
 
@@ -53,18 +79,13 @@ def make_swatches(
     if reverse:
         color_list = color_list[::-1]
 
-    if hex and not float:
-        color_list = [
-            "#" + "".join(map(lambda i: "{0:#0{1}X}".format(i, 4)[2:], x))
-            for x in color_list
-        ]
-
     return color_list
 
 
 def pitch_class_index_to_hue(midinum):
     hue_range = [0, 24, 48, 65, 85, 120, 185, 214, 240, 264, 284, 315]
-    return hue_range[midinum % 12]/120
+    return hue_range[midinum % 12] / 120
+
 
 ratios = [
     36 / 25,
