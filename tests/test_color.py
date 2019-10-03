@@ -65,19 +65,37 @@ def test_note_to_color():
     ]
 
 
+def test_color_float():
+    scheme = make_swatches(
+        start=pitch_class_index_to_hue(0),
+        rotations=1,
+        numbers=3,
+        min_sat=1,
+        max_sat=2,
+        min_light=0.2,
+        max_light=0.90,
+        reverse=True,
+        float=True,
+    ).tolist()
+    tester = [0.81611328, 0.62227518, 0.23794825]
+    assert [
+        scheme[i][1] == pytest.approx(tester[i], 0.0000001) for i in range(len(scheme))
+    ]
+
+
 def test_d():
-    print(
-        make_swatches(
-            start=pitch_class_index_to_hue(0),
-            rotations=1,
-            numbers=21,
-            min_sat=1,
-            max_sat=2,
-            min_light=0.2,
-            max_light=0.90,
-            float=True,
-        )
-    )
+    # print(
+    #     make_swatches(
+    #         start=pitch_class_index_to_hue(0),
+    #         rotations=1,
+    #         numbers=21,
+    #         min_sat=1,
+    #         max_sat=2,
+    #         min_light=0.2,
+    #         max_light=0.90,
+    #         float=True,
+    #     )
+    # )
     # for i in range(12):
     # print(make_swatches(start=pitch_class_index_to_hue(i), rotations=0.75, numbers=3, min_sat=1, max_sat=2, min_light=0.2, max_light=0.9, float=True)[1])
     # print([tuple(x) for x in make_swatches(start=pitch_class_index_to_hue(2), rotations=0.75, numbers=17, min_sat=1, max_sat=2, min_light=0.2, max_light=0.9,float=True)])
