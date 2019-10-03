@@ -27,7 +27,7 @@ def get_accidental(i: int) -> str:
     return s
 
 
-class Pitch:
+class Pitch(object):
     def __init__(self, in_str="B", octave_in: int = 4):
         octave = None
         if not in_str:
@@ -186,7 +186,7 @@ class Interval:
         return Interval(quantity, quality)
 
 
-class Intervals:
+class Intervals(object):
     @staticmethod
     def get_intervals(pitch_names: list, from_root=None):
         intervals = []

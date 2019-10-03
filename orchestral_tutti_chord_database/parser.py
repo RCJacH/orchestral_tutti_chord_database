@@ -1,6 +1,6 @@
 from orchestral_tutti_chord_database.pitch import Pitch
 
-class ChordInfo:
+class ChordInfo(object):
     long = [
         "composer",
         "year",
