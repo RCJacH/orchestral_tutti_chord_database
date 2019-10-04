@@ -151,12 +151,12 @@ class Pitch(object):
         octave = self.octave + oct_diff
         pitch_class = PITCHCLASSES[pitch_class_index]
         new_pitch_class = Pitch(pitch_class, octave)
-        diff = self.diff(new_pitch_class, descending=descending)
+        diff = self.diff(new_pitch_class)
         accidental_index = (-abs(interval) if descending else abs(interval)) - diff
         accidental = get_accidental(accidental_index)
         return Pitch(pitch_class + accidental + str(octave))
 
-    def diff(self, other, class_only=True, descending=False):
+    def diff(self, other, class_only=True):
         """Returns the difference in semitones between two pitches.
         
         Args:
