@@ -1,11 +1,12 @@
 import re
+from typing import Union, Optional
 
 PITCHCLASSES = "CDEFGAB"
 PITCHID = [0, 2, 4, 5, 7, 9, 11]
 DEFAULT_PITCH = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
 
 
-def get_accidental_index(accidental) -> int:
+def get_accidental_index(accidental: Optional[str]) -> int:
     """Returns the index of accidental string, e.g. #->1."""
     if not accidental or type(accidental) != str:
         return 0
@@ -19,7 +20,7 @@ def get_accidental_index(accidental) -> int:
 
 def get_accidental(i: int) -> str:
     """Returns the accidental string from its index, e.g. 1->#."""
-    s = ""
+    s: str = ""
     if i > 0:
         s = "x" * (i // 2) + "#" * (i % 2)
     elif i < 0:
@@ -43,7 +44,18 @@ class Pitch(object):
         midinum: The corresponding midi number.
     """
 
-    def __init__(self, in_str="B", octave_in: int = 4):
+    __slots__ = [
+        "name",
+        "octave",
+        "midinum",
+        "pitch_class",
+        "pitch_class_index",
+        "accidental",
+        "accidental_index",
+        "index",
+    ]
+
+    def __init__(self, in_str: Union[str, int] = "B", octave_in: int = 4):
         """Parse an input, int or str, to create its properties.
 
         An integer input is taken as midi number and will be assigned
@@ -84,8 +96,8 @@ class Pitch(object):
             octave = octave_in
         else:
             octave = int(octave)
-        self.name = self.pitch_class + self.accidental
-        self.octave = octave
+        self.name: str = self.pitch_class + self.accidental
+        self.octave: int = octave
         self.midinum: int = octave * 12 + PITCHID[
             self.pitch_class_index
         ] + self.accidental_index
