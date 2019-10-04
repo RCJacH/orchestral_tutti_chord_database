@@ -28,7 +28,43 @@ def get_accidental(i: int) -> str:
 
 
 class Pitch(object):
+    """A musical pitch.
+
+    
+
+    Attributes:
+        name: Displaying string of pitch, e.g. C#.
+        octave: The sounding octave of a pitched note.
+        pitch_class: The alphabet of a pitch.
+        pitch_class_index: The index of the pitch class, with C=0, B=6.
+        accidental: The accidental modifier string of a pitch.
+        accidental_index: The offset integer from its pitch class.
+        index: The semitones within an octave with C=0, B=11.
+        midinum: The corresponding midi number.
+    """
+
     def __init__(self, in_str="B", octave_in: int = 4):
+        """Parse an input, int or str, to create its properties.
+
+        An integer input is taken as midi number and will be assigned
+        pre-defined pitch names from C major with chromatic alternations
+        from secondary dominant chords - all sharps except for flat 7th
+        degree of V7/IV.
+
+        A string input is taken as pitch names if it matches the format
+        of: (pitch class)(accidental)(octave). Only the pitch class is
+        required, and can be any of the 26 alphabet, capitalized. Any
+        alphabet after G will be converted to A to G in group of seven,
+        thus H is A and not Bb, I = B and so on.
+
+        The number of accidental modifiers are not restricted. Allowed
+        accidental strings are: # = sharp; x = double sharp; b = flat.
+
+        Args:
+            in_str: The input to be parsed, can be int or str.
+            octave_in: The explicit octave assignment, overrides any
+                implicit octave values parsed from in_str.
+        """
         octave = None
         if not in_str:
             raise IndexError("Pitch name cannot be empty.")
@@ -67,6 +103,7 @@ class Pitch(object):
         return self.name + str(self.octave)
 
     def set_properties(self, pitch_class: str, accidental: str):
+        """Assign musical properties from pitch class and accidental."""
         self.pitch_class: str = pitch_class
         self.pitch_class_index: int = PITCHCLASSES.index(pitch_class)
         self.accidental: str = accidental
@@ -74,6 +111,8 @@ class Pitch(object):
         self.index: int = (PITCHID[self.pitch_class_index] + self.accidental_index) % 12
 
     def enharmonics(self) -> list:
+        """Creates a list of enharmonics with maximum of two accidentals."""
+
         def sortlist(x):
             if x == self.name:
                 return -1
@@ -84,8 +123,8 @@ class Pitch(object):
         enharmonics = []
         for adjacent_index in adjacent_indice:
             pitch_class_index = self.pitch_class_index + adjacent_index
-            pitch_class = PITCHCLASSES[pitch_class_index%7]
-            oct_diff = pitch_class_index//7
+            pitch_class = PITCHCLASSES[pitch_class_index % 7]
+            oct_diff = pitch_class_index // 7
             diff = self.diff(Pitch(pitch_class, self.octave + oct_diff))
             if abs(diff) > 2:
                 continue
@@ -93,6 +132,7 @@ class Pitch(object):
         return sorted(enharmonics, key=sortlist)
 
     def transpose(self, interval):
+        """Returns a new Pitch object a set interval away from original."""
         descending = False
         if isinstance(interval, str):
             if interval[0] == "-":
@@ -117,6 +157,12 @@ class Pitch(object):
         return Pitch(pitch_class + accidental + str(octave))
 
     def diff(self, other, class_only=True, descending=False):
+        """Returns the difference in semitones between two pitches.
+        
+        Args:
+            other: A Pitch object to be compared with self.
+            class_only: Ignore accidental modification of the other.
+        """
         self_index = PITCHID[self.pitch_class_index] + self.accidental_index
         other_index = PITCHID[other.pitch_class_index] if class_only else other.index
         diff = other_index - self_index
