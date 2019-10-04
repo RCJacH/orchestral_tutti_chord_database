@@ -31,12 +31,10 @@ def get_accidental(i: int) -> str:
 class Pitch(object):
     """A musical pitch.
 
-    
-
     Attributes:
         name: Displaying string of pitch, e.g. C#.
         octave: The sounding octave of a pitched note.
-        pitch_class: The alphabet of a pitch.
+        pitch_class: The alphabet part of a pitch.
         pitch_class_index: The index of the pitch class, with C=0, B=6.
         accidental: The accidental modifier string of a pitch.
         accidental_index: The offset integer from its pitch class.
@@ -56,7 +54,7 @@ class Pitch(object):
     ]
 
     def __init__(self, in_str: Union[str, int] = "B", octave_in: int = 4):
-        """Parse an input, int or str, to create its properties.
+        """Parse an input, integer or string, to create its properties.
 
         An integer input is taken as midi number and will be assigned
         pre-defined pitch names from C major with chromatic alternations
@@ -66,10 +64,10 @@ class Pitch(object):
         A string input is taken as pitch names if it matches the format
         of: (pitch class)(accidental)(octave). Only the pitch class is
         required, and can be any of the 26 alphabet, capitalized. Any
-        alphabet after G will be converted to A to G in group of seven,
-        thus H is A and not Bb, I = B and so on.
+        alphabet after G will be converted to A to G in groups of seven,
+        thus H is A (not Bb), I is B and so on.
 
-        The number of accidental modifiers are not restricted. Allowed
+        The number of accidental modifiers is not restricted. Allowed
         accidental strings are: # = sharp; x = double sharp; b = flat.
 
         Args:
@@ -183,7 +181,33 @@ class Pitch(object):
 
 
 class Interval:
+    """An interval, the musical distance, between two musical pitches.
+    
+    Args:
+        quantity: The numeric representation of the difference between
+            the pitch class of two pitches.
+        quality: The offset from a perfect/major interval.
+    """
+
+    __slots__ = ["quantity", "quality"]
+
     def __init__(self, lower, upper=None):
+        """Analyze intervalic relationship between lower and upper Pitch.
+
+        When both inputs are integers, the result is a direct assignment
+        with lower number being quantity and upper number being quality.
+
+        When both inputs are strings or Pitch classes, analysis is done
+        to detect the musical interval between two pitches.
+
+        When lower is string and upper received no input, it is assumed
+        to take lower input as scale degree, e.g. 'b3', and will analyze
+        and create representing interval.
+        
+        Args:
+            lower: The lower pitch of an interval.
+            upper: The upper pitch of an interval.
+        """
         if isinstance(lower, int) and isinstance(upper, int):
             self.quantity, self.quality = lower, upper
         elif isinstance(lower, str) and isinstance(upper, str):
@@ -222,13 +246,14 @@ class Interval:
     def values(self):
         return (self.quantity, self.quality)
 
-    def interpret(self, interval):
+    def interpret(self, interval: str):
+        """Interpret scale degree string as an interval."""
         accidental, degree = re.findall(r"([#xb]*)(\d+)", interval)[0]
         quantity, quality = int(degree), get_accidental_index(accidental)
         return (quantity, quality)
 
-    @staticmethod
-    def detect_interval(lower, upper):
+    def detect_interval(self, lower, upper):
+        """Analyze interval between lower pitch and upper pitch."""
         if type(lower) is str:
             lower = Pitch(lower)
         if type(upper) is str:
@@ -237,8 +262,8 @@ class Interval:
         quality = (upper.index - lower.index) % 12 - PITCHID[quantity]
         return (quantity + 1, quality)
 
-    @staticmethod
-    def inversion(quantity, quality):
+    def inversion(self, quantity: int, quality: int):
+        """Create an interval object that is the inversion of input."""
         quantity = 9 - (quantity - 1) % 7 - 1
         quality = -quality if quantity in (1, 4, 5, 8) else -1 - quality
         return Interval(quantity, quality)
