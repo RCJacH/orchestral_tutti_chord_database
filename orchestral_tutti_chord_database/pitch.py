@@ -2,8 +2,8 @@ import re
 from typing import Union, Optional
 
 PITCHCLASSES = "CDEFGAB"
-PITCHID = [0, 2, 4, 5, 7, 9, 11]
-DEFAULT_PITCH = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B"]
+PITCHID = (0, 2, 4, 5, 7, 9, 11)
+DEFAULT_PITCH = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "Bb", "B")
 
 
 def get_accidental_index(accidental: Optional[str]) -> int:
