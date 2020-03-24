@@ -1,5 +1,7 @@
-
+# Cache
 *.py[cod]
+__pycache__
+*_cache
 
 # C extensions
 *.so
@@ -24,7 +26,6 @@ __pycache__
 pip-log.txt
 
 # Unit test / coverage reports
-.pytest_cache
 .coverage
 .tox
 nosetests.xml
@@ -38,5 +39,7 @@ htmlcov*
 .project
 .pydevproject
 
-# sublime
+# editor
 *.sublime*
+.vscode
+*workspace
